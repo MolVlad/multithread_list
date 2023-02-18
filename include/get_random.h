@@ -6,6 +6,7 @@
 #include "assert.h"
 #include "fcntl.h"
 #include "unistd.h"
+#include <bitset>
 #include "num_type.h"
 
 #ifdef REAL_RANDOM
