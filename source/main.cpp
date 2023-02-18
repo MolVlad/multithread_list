@@ -23,21 +23,16 @@ int main() {
 	}
 	#endif // DEBUG
 
-	LIST *list1 = create_list(random_values, LIST_SIZE);
-	LIST *list2 = create_list(random_values, LIST_SIZE);
+	LIST *list = create_list(random_values, LIST_SIZE);
 	free(random_values);
 
-	print_list(list1);
-	print_list_backward(list1);
+	std::cout << "List is generated:" << std::endl;
+	print_list(list);
+	
+	process_list_forward(list);
+	//process_list_backward(list);
 
-	print_list(list2);
-	print_list_backward(list2);
-
-	process_list(list1);
-	process_list_backward(list2);
-
-	delete_list(list1);
-	delete_list(list2);
+	delete_list(list);
 
 	return 0;
 }

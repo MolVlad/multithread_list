@@ -24,5 +24,4 @@ memory:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(OUT)
 
 clean:
-	rm -f callgrind.out* a.out perf.data perf.data.old
-
+	rm -f a.out 

@@ -29,3 +29,6 @@
 `make` - compile and run execution
 
 `make debug` - compile and run execution with detailed logging
+
+`make memory` - compile and run execution with memory check by valgrind
+
