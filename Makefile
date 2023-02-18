@@ -8,12 +8,12 @@ OUT=a.out
 
 .PHONY: debug run compile memory clean
 
-debug:
-	$(CC) $(OPT_FLAGS) -DDEBUG $(INC) -o $(OUT) $(SRC_FILES) $(LIBS)
-	./$(OUT)
-
 run:
 	$(CC) $(OPT_FLAGS) $(INC) -o $(OUT) $(SRC_FILES) $(LIBS)
+	./$(OUT)
+
+debug:
+	$(CC) $(OPT_FLAGS) -DDEBUG $(INC) -o $(OUT) $(SRC_FILES) $(LIBS)
 	./$(OUT)
 
 compile:

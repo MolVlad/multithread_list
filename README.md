@@ -26,6 +26,6 @@
 
 ## Launch instructions
 
-`make run` - compile and run execution
+`make` - compile and run execution
 
 `make debug` - compile and run execution with detailed logging
