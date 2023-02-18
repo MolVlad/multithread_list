@@ -3,7 +3,7 @@
 LIST * create_list(NUM_TYPE *values, unsigned size)
 {
 	LIST *list = (LIST *) malloc(sizeof(LIST));
-	list->size = size;
+	list->initial_size = size;
 
 	if (size == 0)
 	{
@@ -53,7 +53,7 @@ void print_list(LIST *list)
 {
 	int counter = 0;
 	std::cout << std::endl << "\t\t\t\t\t\t\t<<<<< LIST from head >>>>>" << std::endl;
-	std::cout << std::setw(10) << "Size: " << list->size << "\t\tHead: " << list->head << "\t\tTail: " << list->tail << std::endl;
+	std::cout << std::setw(10) << "Size: " << list->initial_size << "\t\tHead: " << list->head << "\t\tTail: " << list->tail << std::endl;
 	NODE *node = list->head;
 	while (node != NULL)
 	{
@@ -78,9 +78,9 @@ void print_list(LIST *list)
 
 void print_list_backward(LIST *list)
 {
-	int counter = list->size-1;
+	int counter = list->initial_size-1;
 	std::cout << std::endl << "\t\t\t\t\t\t\t<<<<< LIST from tail >>>>>" << std::endl;
-	std::cout << std::setw(10) << "Size: " << list->size << "\t\tHead: " << list->head << "\t\tTail: " << list->tail << std::endl;
+	std::cout << std::setw(10) << "Size: " << list->initial_size << "\t\tHead: " << list->head << "\t\tTail: " << list->tail << std::endl;
 	NODE *node = list->tail;
 	while (node != NULL)
 	{
@@ -102,3 +102,60 @@ void print_list_backward(LIST *list)
 		node = node->prev;
 	}
 }
+
+void process_list(LIST *list)
+{
+	unsigned zero_bit_count = 0;
+	unsigned block_count = 0;
+
+	while (list->head != NULL)
+	{
+		if (list->head == list->tail)
+		{
+			list->tail = NULL;
+		}
+
+		NODE *node = list->head;
+
+		zero_bit_count += sizeof(NUM_TYPE)*8 - std::bitset<sizeof(NUM_TYPE)*8>(node->value).count();
+		block_count++;
+
+		list->head = node->next;
+		if (list->head != NULL)
+		{
+			list->head->prev = NULL;
+		}
+		free(node);
+	}
+
+	std::cout << "Zero bits were counted from the head: " << block_count << " blocks, " << zero_bit_count << " zero bits" << std::endl;
+}
+
+void process_list_backward(LIST *list)
+{
+	unsigned one_bit_count = 0;
+	unsigned block_count = 0;
+
+	while (list->tail != NULL)
+	{
+		if (list->head == list->tail)
+		{
+			list->head = NULL;
+		}
+
+		NODE *node = list->tail;
+
+		one_bit_count += std::bitset<sizeof(NUM_TYPE)*8>(node->value).count();
+		block_count++;
+
+		list->tail = node->prev;
+		if (list->tail != NULL)
+		{
+			list->tail->next = NULL;
+		}
+		free(node);
+	}
+
+	std::cout << "One bits were counted from the tail: " << block_count << " blocks, " << one_bit_count << " one bits" << std::endl;
+}
+

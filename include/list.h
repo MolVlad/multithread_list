@@ -19,12 +19,14 @@ typedef struct LIST
 {
 	struct NODE * head;
 	struct NODE * tail;
-	int size;
+	int initial_size;
 } LIST;
 
 LIST * create_list(NUM_TYPE *values, unsigned size);
 void delete_list(LIST *list);
 void print_list(LIST *list);
 void print_list_backward(LIST *list);
+void process_list(LIST *list);
+void process_list_backward(LIST *list);
 
 #endif // LIST_H

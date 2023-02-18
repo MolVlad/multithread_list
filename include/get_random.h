@@ -8,7 +8,7 @@
 #include "unistd.h"
 #include "num_type.h"
 
-const char RANDOM_DEV[] = "/dev/random";
+const char RANDOM_DEV[] = "/dev/urandom";
 
 void get_random_number(NUM_TYPE *random_value);
 

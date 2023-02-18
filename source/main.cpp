@@ -23,16 +23,22 @@ int main() {
 	}
 	#endif // DEBUG
 
-	LIST *list = create_list(random_values, LIST_SIZE);
-
-	print_list(list);
-	print_list_backward(list);
-
+	LIST *list1 = create_list(random_values, LIST_SIZE);
+	LIST *list2 = create_list(random_values, LIST_SIZE);
 	free(random_values);
-	delete_list(list);
+
+	print_list(list1);
+	print_list_backward(list1);
+
+	print_list(list2);
+	print_list_backward(list2);
+
+	process_list(list1);
+	process_list_backward(list2);
+
+	delete_list(list1);
+	delete_list(list2);
 
 	return 0;
 }
-
-
 
