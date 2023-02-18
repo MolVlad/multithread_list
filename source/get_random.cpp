@@ -33,3 +33,25 @@ void get_random_number(NUM_TYPE *random_value)
 	}
 }
 
+NUM_TYPE* get_random_array(unsigned size)
+{
+	NUM_TYPE *random_values = (NUM_TYPE*) malloc(size * sizeof(NUM_TYPE));
+	assert(random_values);
+
+	std::cout << "Generate random numbers from linux kernel (" << RANDOM_DEV << ")..." << std::endl;
+	std::cout << "(In case of stuck, take random actions to add entropy)" << std::endl;
+	for (int i = 0; i < size; i++)
+	{
+		get_random_number(random_values + i);
+	}
+
+	#ifdef DEBUG
+	for (int i = 0; i < size; i++)
+	{
+		std::cout << "Generated: b" << std::bitset<sizeof(NUM_TYPE)*8>(random_values[i]) << " (" << random_values[i] << ", " << sizeof(NUM_TYPE) << " bytes)" << std::endl;
+	}
+	#endif // DEBUG
+
+	return random_values;
+}
+

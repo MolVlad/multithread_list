@@ -1,116 +1,116 @@
 #include "list.h"
 
-LIST * create_list(NUM_TYPE *values, unsigned size)
+List::List(NUM_TYPE *values, unsigned size)
 {
 	assert(size);
 
-	LIST *list = (LIST *) malloc(sizeof(LIST));
-	assert(list);
-
-	list->initial_size = size;
-	list->mutex_arr = (std::mutex **) malloc(sizeof(std::mutex*) * size);
-	assert(list->mutex_arr);
+	initial_size = size;
+	mutex_arr = (std::mutex **) malloc(sizeof(std::mutex*) * size);
+	assert(mutex_arr);
 
 	for (int i = 0; i < size; i++)
 	{
-		list->mutex_arr[i] = new std::mutex;
-		assert(list->mutex_arr[i]);
+		mutex_arr[i] = new std::mutex;
+		assert(mutex_arr[i]);
 	}
 
-	list->print_mutex = new std::mutex;
-	assert(list->print_mutex);
+	print_mutex = new std::mutex;
+	assert(print_mutex);
 
-	list->head_mutex = new std::mutex;
-	assert(list->head_mutex);
+	head_mutex = new std::mutex;
+	assert(head_mutex);
 
-	NODE *prev_node = NULL;
-	NODE *node;
+	Node *prev_node = NULL;
+	Node *node;
 	for (int i = 0; i < size; i++)
 	{
-		node = (NODE*) malloc(sizeof(NODE));
-		assert(node);
+		node = new Node(values[i]);
 
-		node->value = values[i];
-		node->next = NULL;
-		node->prev = prev_node;
+		node->set_next(NULL);
+		node->set_prev(prev_node);
+
 		if (i == 0)
 		{
-			list->head = node;
+			head = node;
 		}
 		else
 		{
-			prev_node->next = node;
+			prev_node->set_next(node);
 		}
 		prev_node = node;
 	}
 
-	list->tail = node;
-	
-	return list;
+	tail = node;
 }
 
-void delete_list(LIST *list)
+List::~List()
 {
-	for (int i = 0; i < list->initial_size; i++)
+	for (int i = 0; i < initial_size; i++)
 	{
-		delete list->mutex_arr[i];
+		delete mutex_arr[i];
 	}
-	delete list->print_mutex;
-	delete list->head_mutex;
-	free(list->mutex_arr);
-	free(list);
+	free(mutex_arr);
+
+	delete print_mutex;
+	delete head_mutex;
 }
 
-void print_list(LIST *list)
+void List::print()
 {
 	int counter = 0;
 	std::cout << std::endl << "\t\t\t\t\t\t\t<<<<< LIST from head >>>>>" << std::endl;
-	std::cout << std::setw(10) << "Size: " << list->initial_size << "\t\tHead: " << list->head << "\t\tTail: " << list->tail << std::endl;
-	NODE *node = list->head;
+	std::cout << std::setw(10) << "Size: " << initial_size << "\t\tHead: " << head << "\t\tTail: " << tail << std::endl;
+	Node *node = head;
 	while (node != NULL)
 	{
 		std::cout << std::setw (10) << "Node: " << counter;
 		std::cout << "\t\tThis: " << node;
-		std::cout << "\t\tNext: " << node->next;
-		if (node->next == NULL)
+
+		Node *next = node->get_next();
+		std::cout << "\t\tNext: " << next;
+		if (next == NULL)
 		{
 			std::cout << "\t";
 		}
-		std::cout << "\t\tPrev: " << node->prev;
-		if (node->prev == NULL)
+
+		Node *prev = node->get_prev();
+		std::cout << "\t\tPrev: " << prev;
+		if (prev == NULL)
 		{
 			std::cout << "\t";
 		}
-		std::cout << "\t\tValue: b" << std::bitset<sizeof(NUM_TYPE)*8>(node->value) << " (" << node->value << ", " << sizeof(NUM_TYPE) << " bytes)" << std::endl;
+
+		NUM_TYPE value = node->get_value();
+		std::cout << "\t\tValue: b" << std::bitset<sizeof(NUM_TYPE)*8>(value) << " (" << value << ", " << sizeof(NUM_TYPE) << " bytes)" << std::endl;
 		
 		counter += 1;
-		node = node->next;
+		node = next;
 	}
 }
 
-void process_list(LIST *list)
+void List::process()
 {
-	bool locked = list->head_mutex->try_lock();
+	bool locked = head_mutex->try_lock();
 
 	if (locked)
 	{
-		process_forward(list);
+		process_forward();
 	}
 	else
 	{
-		process_backward(list);
+		process_backward();
 	}
 }
 
-void process_forward(LIST *list)
+void List::process_forward()
 {
 	unsigned zero_bit_count = 0;
 	unsigned block_count = 0;
 	unsigned block_idx = 0;
 
-	while (list->head != NULL)
+	while (head != NULL)
 	{
-		bool locked = list->mutex_arr[block_idx]->try_lock();
+		bool locked = mutex_arr[block_idx]->try_lock();
 		if (!locked)
 		{
 			#ifdef DEBUG
@@ -120,30 +120,30 @@ void process_forward(LIST *list)
 			break;
 		}
 
-		NODE *node = list->head;
-		zero_bit_count += count_zero_bits(node->value);
+		Node *node = head;
+		zero_bit_count += node->count_zero_bits();
 		block_count++;
 		block_idx++;
 
-		list->head = node->next;
+		head = node->get_next();
 
-		free(node);
+		delete node;
 	}
 
-	list->print_mutex->lock();
+	print_mutex->lock();
 	std::cout << "Zero bits were counted from the head: " << block_count << " blocks, " << zero_bit_count << " zero bits" << std::endl;
-	list->print_mutex->unlock();
+	print_mutex->unlock();
 }
 
-void process_backward(LIST *list)
+void List::process_backward()
 {
 	unsigned one_bit_count = 0;
 	unsigned block_count = 0;
-	unsigned block_idx = list->initial_size - 1;
+	unsigned block_idx = initial_size - 1;
 
-	while (list->tail != NULL)
+	while (tail != NULL)
 	{
-		bool locked = list->mutex_arr[block_idx]->try_lock();
+		bool locked = mutex_arr[block_idx]->try_lock();
 		if (locked == false)
 		{
 			#ifdef DEBUG
@@ -153,29 +153,18 @@ void process_backward(LIST *list)
 			break;
 		}
 
-		NODE *node = list->tail;
-		one_bit_count += count_one_bits(node->value);
+		Node *node = tail;
+		one_bit_count += node->count_one_bits();
 		block_count++;
 		block_idx--;
 
-		list->tail = node->prev;
+		tail = node->get_prev();
 
-		free(node);
+		delete node;
 	}
 
-	list->print_mutex->lock();
+	print_mutex->lock();
 	std::cout << "One bits were counted from the tail: " << block_count << " blocks, " << one_bit_count << " one bits" << std::endl;
-	list->print_mutex->unlock();
+	print_mutex->unlock();
 }
-
-unsigned count_zero_bits(NUM_TYPE value)
-{
-	return sizeof(NUM_TYPE)*8 - std::bitset<sizeof(NUM_TYPE)*8>(value).count();
-}
-
-unsigned count_one_bits(NUM_TYPE value)
-{
-	return std::bitset<sizeof(NUM_TYPE)*8>(value).count();
-}
-
 

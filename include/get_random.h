@@ -15,6 +15,7 @@ const char RANDOM_DEV[] = "/dev/urandom";
 #endif // REAL_RANDOM
 
 void get_random_number(NUM_TYPE *random_value);
+NUM_TYPE* get_random_array(unsigned size);
 
 #endif // GET_RANDOM_H
 
