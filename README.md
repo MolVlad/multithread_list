@@ -28,7 +28,19 @@
 
 `make` - compile and run execution
 
-`make debug` - compile and run execution with detailed logging
+![image](https://user-images.githubusercontent.com/36729129/219877052-cf0087bf-3f55-4a5d-a9a4-658b9b0382e6.png)
+
+`make print` - compile and run execution with printing list
+
+![image](https://user-images.githubusercontent.com/36729129/219877105-d4e136d6-d3c8-45f4-b4c5-cda1d781b9ff.png)
 
 `make memory` - compile and run execution with memory check by valgrind
+
+![image](https://user-images.githubusercontent.com/36729129/219877128-351dc389-925b-4799-91f6-affc83fc1382.png)
+
+`make real_random` - compile and run execution with usage `/dev/random` which is "more random"
+
+`make debug` - compile and run execution with detailed logging
+
+
 
