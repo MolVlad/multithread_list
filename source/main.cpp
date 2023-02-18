@@ -1,10 +1,18 @@
-#include "stdio.h"
-#include "stdlib.h"
-#include "assert.h"
+#include "get_random.h"
+#include "iostream"
 
 int main() {
-	printf("Hello\n");
+	NUM_TYPE random_value;
+
+	get_random_number(&random_value);
+	std::cout << "Generated: " << random_value << std::endl;
+	get_random_number(&random_value);
+	std::cout << "Generated: " << random_value << std::endl;
+	get_random_number(&random_value);
+	std::cout << "Generated: " << random_value << std::endl;
 
 	return 0;
 }
+
+
 
