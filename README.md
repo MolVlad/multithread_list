@@ -1,5 +1,7 @@
 # Multithreaded list
 
+## Problem statement
+
 1. Сформировать в памяти двусвязный список определенного размера,
 содержащий случайные значения, которые следует получить из генератора
 случайных чисел, встроенного в ядро Linux.
@@ -21,3 +23,9 @@
 
 5. Желательно, чтобы в потоках работали не две разные функции, а
 одна, принимающая особенности работы через аргументы.
+
+## Launch instructions
+
+`make run` - compile and run execution
+
+`make debug` - compile and run execution with detailed logging
