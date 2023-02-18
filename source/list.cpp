@@ -17,6 +17,12 @@ LIST * create_list(NUM_TYPE *values, unsigned size)
 		assert(list->mutex_arr[i]);
 	}
 
+	list->print_mutex = new std::mutex;
+	assert(list->print_mutex);
+
+	list->head_mutex = new std::mutex;
+	assert(list->head_mutex);
+
 	NODE *prev_node = NULL;
 	NODE *node;
 	for (int i = 0; i < size; i++)
@@ -49,6 +55,8 @@ void delete_list(LIST *list)
 	{
 		delete list->mutex_arr[i];
 	}
+	delete list->print_mutex;
+	delete list->head_mutex;
 	free(list->mutex_arr);
 	free(list);
 }
@@ -80,7 +88,21 @@ void print_list(LIST *list)
 	}
 }
 
-void process_list_forward(LIST *list)
+void process_list(LIST *list)
+{
+	bool locked = list->head_mutex->try_lock();
+
+	if (locked)
+	{
+		process_forward(list);
+	}
+	else
+	{
+		process_backward(list);
+	}
+}
+
+void process_forward(LIST *list)
 {
 	unsigned zero_bit_count = 0;
 	unsigned block_count = 0;
@@ -108,10 +130,12 @@ void process_list_forward(LIST *list)
 		free(node);
 	}
 
+	list->print_mutex->lock();
 	std::cout << "Zero bits were counted from the head: " << block_count << " blocks, " << zero_bit_count << " zero bits" << std::endl;
+	list->print_mutex->unlock();
 }
 
-void process_list_backward(LIST *list)
+void process_backward(LIST *list)
 {
 	unsigned one_bit_count = 0;
 	unsigned block_count = 0;
@@ -139,7 +163,9 @@ void process_list_backward(LIST *list)
 		free(node);
 	}
 
+	list->print_mutex->lock();
 	std::cout << "One bits were counted from the tail: " << block_count << " blocks, " << one_bit_count << " one bits" << std::endl;
+	list->print_mutex->unlock();
 }
 
 unsigned count_zero_bits(NUM_TYPE value)
